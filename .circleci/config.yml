@@ -43,18 +43,26 @@ jobs:
             tox
 
   section_07_deploy_app_to_railway:
-    <<: *defaults
-    steps:
-      - checkout:
-          path: ~/project/
-      - node/install:
-          node-version: '16.13'
-      - run: node --version
-      - run: npm i -g @railway/cli
-      - run:
-          name: Deploy to Railway App (You must set RAILWAY_TOKEN env var)
-          command: |
-            cd section-07-ci-and-publishing/house-prices-api && railway up --detach
+  <<: *defaults
+  steps:
+    - checkout:
+        path: ~/project/
+    - node/install:
+        node-version: '16.13'
+    - run: node --version
+    - run: npm i -g @railway/cli
+    - run:
+        name: Deploy to Railway App (You must set RAILWAY_TOKEN env var)
+        command: |
+          # Set Railway token as an environment variable
+          echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}" >> $GITHUB_ENV
+
+          # Navigate to the app directory
+          cd section-07-ci-and-publishing/house-prices-api
+
+          # Link project and deploy
+          railway link --project "e18596a2-886d-4248-81e7-b7be68db30a6" --environment "production" 
+          railway up --detach
 
   section_07_test_and_upload_regression_model:
     <<: *defaults
