@@ -83,8 +83,8 @@ jobs:
     <<: *defaults
     steps:
       - setup_remote_docker:
-        version: default  # Default Docker version provided by CircleCI
-        docker_layer_caching: true  # Optional, speeds up builds if caching is enabled
+          # Supported versions: https://circleci.com/docs/2.0/building-docker-images/#docker-version
+          version: 20.10.18
       - checkout:
           path: ~/project/
       - node/install:
@@ -94,7 +94,7 @@ jobs:
       - run:
           name: Build and run Dockerfile (see https://docs.railway.app/deploy/dockerfiles)
           command: |
-            cd section-08-deploying-with-containers && railway up --detach
+            cd section-08-deploying-with-containers && railway up --service="$RAILWAY_SERVICE_NAME" --detach
 
   test_regression_model_py37:
     docker:
