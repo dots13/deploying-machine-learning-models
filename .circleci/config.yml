@@ -53,8 +53,9 @@ jobs:
       - run: npm i -g @railway/cli
       - run:
           name: Deploy to Railway App (You must set RAILWAY_TOKEN env var)
+          env:
+            RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           command: |
-            export RAILWAY_TOKEN="${{ secrets.RAILWAY_TOKEN }}"
             cd section-07-ci-and-publishing/house-prices-api && railway up --detach
 
   section_07_test_and_upload_regression_model:
