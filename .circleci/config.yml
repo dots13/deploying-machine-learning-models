@@ -80,26 +80,20 @@ jobs:
 
 
   section_08_deploy_app_container_via_railway:
-  <<: *defaults
-  steps:
-    - setup_remote_docker:
-        docker_layer_caching: true  # Optional, speeds up builds if caching is enabled
-    - checkout:
-        path: ~/project/
-    - run:
-        name: Install Node.js 16.13 using NVM
-        command: |
-          curl -sL https://deb.nodesource.com/setup_16.x | bash -  # Install Node.js 16.x
-          sudo apt-get install -y nodejs  # Install Node.js
-    - run:
-        name: Verify Node.js version
-        command: node --version  # Verify installed version of Node.js
-    - run:
-        name: Install Railway CLI
-        command: npm i -g @railway/cli  # Install Railway CLI globally
-    - run:
-        name: Build and run Dockerfile with Railway
-        command: |
+    <<: *defaults
+    steps:
+      - setup_remote_docker:
+          # Supported versions: https://circleci.com/docs/2.0/building-docker-images/#docker-version
+          version: 20.10.18
+      - checkout:
+          path: ~/project/
+      - node/install:
+          node-version: '16.13'
+      - run: node --version
+      - run: npm i -g @railway/cli
+      - run:
+          name: Build and run Dockerfile (see https://docs.railway.app/deploy/dockerfiles)
+          command: |
             cd section-08-deploying-with-containers && railway up --service="$RAILWAY_SERVICE_NAME" --detach
 
   test_regression_model_py37:
