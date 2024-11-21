@@ -83,8 +83,8 @@ jobs:
     <<: *defaults
     steps:
       - setup_remote_docker:
-          # Supported versions: https://circleci.com/docs/2.0/building-docker-images/#docker-version
-          version: default
+        version: default  # Default Docker version provided by CircleCI
+        docker_layer_caching: true  # Optional, speeds up builds if caching is enabled
       - checkout:
           path: ~/project/
       - node/install:
