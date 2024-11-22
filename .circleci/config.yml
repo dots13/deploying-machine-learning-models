@@ -185,6 +185,11 @@ jobs:
             . venv/bin/activate
             pip install --upgrade pip  # Upgrade pip inside the virtual environment
       - run:
+          name: Install requirements
+          command: |
+            . venv/bin/activate
+            pip install -r packages/regression_model/requirements.txt
+      - run:
           name: Set script permissions and fetch data
           command: |
             . venv/bin/activate
@@ -194,11 +199,6 @@ jobs:
           name: Verify dataset is downloaded
           command: |
             ls -lh packages/regression_model/regression_model/datasets/
-      - run:
-          name: Install requirements
-          command: |
-            . venv/bin/activate
-            pip install -r packages/regression_model/requirements.txt
       - run:
           name: Train model
           command: |
