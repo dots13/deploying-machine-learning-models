@@ -166,10 +166,14 @@ jobs:
             tox -e py38  # Run tox using the Python 3.8 environment
 
   train_and_upload_regression_model:
-    <<: *defaults
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/project
     steps:
       - checkout
-      - *prepare_venv
+      - restore_cache:
+          keys:
+            - venv-{{ checksum "packages/ml_api/requirements.txt" }}  # Restore the cache using the same key
       - run: 
           name: Install requirements
           command: |
