@@ -163,7 +163,7 @@ jobs:
           name: Run API tests with Python 3.8
           command: |
             . venv/bin/activate
-            tox -e py38 -- --clear
+            tox -e py38
 
   train_and_upload_regression_model:
     <<: *defaults
