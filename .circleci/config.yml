@@ -170,22 +170,20 @@ jobs:
       - image: circleci/python:3.8
     working_directory: ~/project
     steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - venv-{{ checksum "packages/ml_api/requirements.txt" }}  # Restore the cache using the same key
-      - run: 
+      - checkout:
+          path: ~/project
+      - run:
           name: Install requirements
           command: |
             . venv/bin/activate
             pip install -r packages/regression_model/requirements.txt
       - *fetch_data
-      - run: 
+      - run:
           name: Train model
           command: |
             . venv/bin/activate
             PYTHONPATH=./packages/regression_model python3 packages/regression_model/regression_model/train_pipeline.py
-      - run: 
+      - run:
           name: Publish model to Gemfury
           command: |
             . venv/bin/activate
