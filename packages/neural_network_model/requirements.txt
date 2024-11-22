@@ -1,17 +1,18 @@
 # production requirements
-pandas>=1.3.0  # Updated for compatibility with newer TensorFlow
-numpy>=1.21.0  # Updated for TensorFlow compatibility
-scikit-learn>=1.0.2  # Updated for modern Python and pandas compatibility
-tensorflow>=2.13.0  # TensorFlow includes Keras; latest stable version
-opencv-python>=4.5.3  # Modern version for computer vision tasks
-h5py>=3.8.0  # Compatible with TensorFlow 2.x
+pandas==0.23.4
+numpy==1.13.3
+scikit-learn==0.19.0
+Keras==2.1.3
+opencv-python==4.0.0.21
+h5py==2.9.0
+Theano==0.9.0
 
 # packaging
-setuptools>=58.0.0  # Updated to modern standards
-wheel>=0.36.0  # Compatible with Python 3.8+
+setuptools==40.6.3
+wheel==0.32.3
 
 # testing requirements
-pytest>=7.0.0  # Modern version for Python 3.8+
+pytest==4.0.2
 
 # fetching datasets
-kaggle>=1.5.12  # Updated to the latest version
+kaggle==1.5.1.1
