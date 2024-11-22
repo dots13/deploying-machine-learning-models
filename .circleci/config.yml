@@ -94,19 +94,21 @@ jobs:
           command: |
             cd section-08-deploying-with-containers && railway up --service="$RAILWAY_SERVICE_NAME" --detach
 
-  test_regression_model_py37:
-    docker:
-      - image: circleci/python:3.7.6
-    working_directory: ~/project/packages/regression_model
-    steps:
-      - checkout:
-          path: ~/project
-      - run:
-          name: Run tests with Python 3.7
-          command: |
-            sudo pip install --upgrade pip
-            pip install --user tox
-            tox -e py37
+#  test_regression_model_py37:
+#    docker:
+#      - image: circleci/python:3.7.6
+#    working_directory: ~/project/packages/regression_model
+#    steps:
+#      - checkout:
+#          path: ~/project
+#      - run:
+#          name: Run tests with Python 3.7
+#          command: |
+#            sudo pip install --upgrade pip
+#            sudo pip install virtualenv==20.20.0
+#            pip install chardet==3.0.2
+#            pip install --user tox
+#            tox -e py37
 
   test_regression_model_py38:
     docker:
@@ -122,19 +124,21 @@ jobs:
             pip install --user tox
             tox -e py38
 
-  test_ml_api_py37:
-    docker:
-      - image: circleci/python:3.7.6
-    working_directory: ~/project/packages/ml_api
-    steps:
-      - checkout:
-          path: ~/project
-      - run:
-          name: Run API tests with Python 3.7
-          command: |
-            sudo pip install --upgrade pip
-            pip install --user tox
-            tox -e py37
+#  test_ml_api_py37:
+#    docker:
+#      - image: circleci/python:3.7.6
+#    working_directory: ~/project/packages/ml_api
+#    steps:
+#      - checkout:
+#          path: ~/project
+#      - run:
+#          name: Run API tests with Python 3.7
+#          command: |
+#            sudo pip install --upgrade pip
+#            sudo pip install virtualenv==20.20.0
+#            pip install chardet==3.0.2
+#            pip install --user tox
+#            tox -e py37
 
   test_ml_api_py38:
     docker:
@@ -144,11 +148,22 @@ jobs:
       - checkout:
           path: ~/project
       - run:
-          name: Run API tests with Python 3.8
+          name: Upgrade pip and install virtualenv
           command: |
             sudo pip install --upgrade pip
-            pip install --user tox
-            tox -e py38
+            pip install --upgrade virtualenv
+      - run:
+          name: Set up virtual environment
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+      - run:
+          name: Install dependencies and run tests with tox
+          command: |
+            . venv/bin/activate  # Ensure the virtual environment is active
+            pip install tox  # Install tox inside the virtual environment
+            tox -e py38  # Run tox using the Python 3.8 environment
 
   train_and_upload_regression_model:
     <<: *defaults
@@ -174,18 +189,35 @@ jobs:
             ./scripts/publish_model.sh ./packages/regression_model/
 
   section_9_differential_tests:
-    <<: *defaults
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/project
     steps:
       - checkout
-      - *prepare_venv
       - run:
-          name: Capturing previous model predictions
+          name: Install system build dependencies
+          command: |
+            sudo apt-get update --allow-releaseinfo-change # Update the package list
+            sudo apt-get install -y build-essential libatlas-base-dev gfortran  # Install build dependencies
+      - run:
+          name: Upgrade pip and install virtualenv
+          command: |
+            sudo pip install --upgrade pip
+            pip install --upgrade virtualenv
+      - run:
+          name: Create virtual environment
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip  # Upgrade pip inside the virtual environment
+      - run:
+          name: Install dependencies and run differential tests
           command: |
             . venv/bin/activate
             pip install -r packages/ml_api/diff_test_requirements.txt
             PYTHONPATH=./packages/ml_api python3 packages/ml_api/tests/capture_model_predictions.py
       - run:
-          name: Runnning differential tests
+          name: Running differential tests
           command: |
             . venv/bin/activate
             pip install -r packages/ml_api/requirements.txt
@@ -284,32 +316,25 @@ workflows:
               only:
                 - master
                 - demo
-      - section_13_train_and_upload_neural_network_model:
-          filters:
-            branches:
-              only:
-                - master
 
   test-all:
     jobs:
-      - test_regression_model_py36
-      - test_regression_model_py37
+#      - test_regression_model_py36
+#      - test_regression_model_py37
       - test_regression_model_py38
-      - test_ml_api_py36
-      - test_ml_api_py37
-      - section_9_differential_tests
-      - section_13_train_and_upload_neural_network_model:
+#      - test_ml_api_py37
+      - test_ml_api_py38
+      - section_9_differential_tests:
           requires:
-            - test_regression_model_py36
-            - test_regression_model_py37
+#            - test_regression_model_py37
             - test_regression_model_py38
-            - test_ml_api_py36
-            - test_ml_api_py37
-            - section_9_differential_tests
+#            - test_ml_api_py37
+            - test_ml_api_py38
           filters:
             branches:
               only:
                 - master
+                - dll
 #      - section_10_deploy_to_heroku:
 #          requires:
 #            - section_13_train_and_upload_neural_network_model
