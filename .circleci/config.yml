@@ -154,8 +154,15 @@ jobs:
             sudo pip install --upgrade pip
             pip install --upgrade virtualenv
       - run:
+          name: Set up virtual environment and install tox
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install tox
+      - run:
           name: Run API tests with Python 3.8
           command: |
+            . venv/bin/activate
             tox -e py38 -- --clear
 
   train_and_upload_regression_model:
