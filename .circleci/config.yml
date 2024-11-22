@@ -118,10 +118,14 @@ jobs:
       - checkout:
           path: ~/project
       - run:
-          name: Run tests with Python 3.8
+          name: Install compatible versions of tools
           command: |
-            sudo pip install --upgrade pip
-            sudo pip install virtualenv==20.20.0
+            pip install --upgrade pip
+            pip install virtualenv==20.24.4  # Pin virtualenv
+            pip install tox==3.28.0         # Pin tox
+      - run:
+          name: Run regression model tests with Python 3.8
+          command: |
             pip install chardet==3.0.2
             pip install --user tox
             tox -e py38
@@ -151,10 +155,15 @@ jobs:
       - checkout:
           path: ~/project
       - run:
-          name: Run API tests with Python 3.8
+          name: Install compatible versions of tools
           command: |
             sudo pip install --upgrade pip
-            sudo pip install virtualenv==20.20.0
+            sudo pip install virtualenv==20.24.4  # Pin virtualenv
+            sudo pip install tox==3.28.0         # Pin tox
+      - run:
+          name: Run API tests with Python 3.8
+          command: |
+            pip install --upgrade pip
             pip install chardet==3.0.2
             pip install --user tox
             tox -e py38
