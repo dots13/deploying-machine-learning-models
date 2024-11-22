@@ -112,19 +112,29 @@ jobs:
 
   test_regression_model_py38:
     docker:
-      - image: circleci/python:3.8.1
+      - image: circleci/python:3.8.13
     working_directory: ~/project/packages/regression_model
     steps:
       - checkout:
           path: ~/project
       - run:
-          name: Run tests with Python 3.8
+          name: Upgrade pip and install dependencies
           command: |
-            sudo pip install --upgrade pip
-            sudo pip install virtualenv==20.20.0
-            pip install chardet==3.0.2
-            pip install --user tox
-            tox -e py38
+            python -m pip install --upgrade pip
+            pip install chardet==3.0.2  # Fix chardet version conflict
+            pip install virtualenv==20.20.0  # Install specific version of virtualenv
+            pip install tox  # Install tox
+      - run:
+            name: Set up virtual environment and run tox tests
+            command: |
+                # Create a virtual environment to isolate dependencies
+                python -m virtualenv venv
+                source venv/bin/activate
+                # Install required packages inside the virtual environment
+                pip install -r requirements.txt
+                # Run tox tests for Python 3.8
+                tox -e py38
+              
 
   test_ml_api_py37:
     docker:
