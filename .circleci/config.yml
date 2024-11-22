@@ -190,14 +190,14 @@ jobs:
 
   section_9_differential_tests:
     docker:
-      - image: circleci/python:3.8.1  # Python 3.8 image
+      - image: circleci/python:3.8.
     working_directory: ~/project
     steps:
       - checkout
       - run:
           name: Install system build dependencies
           command: |
-            sudo apt-get update  # Update the package list
+            sudo apt-get update --allow-releaseinfo-change # Update the package list
             sudo apt-get install -y build-essential libatlas-base-dev gfortran  # Install build dependencies
       - run:
           name: Upgrade pip and install virtualenv
