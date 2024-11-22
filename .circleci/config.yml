@@ -309,8 +309,8 @@ tags_only: &tags_only
     tags:
       only: /^.*/
 
-#workflows:
-#  version: 2
+workflows:
+  version: 2
 #  deploy_pipeline:
 #    jobs:
 #      - section_07_test_app
