@@ -112,21 +112,15 @@ jobs:
 
   test_regression_model_py38:
     docker:
-      - image: circleci/python:3.8
+      - image: circleci/python:3.8.0
     working_directory: ~/project/packages/regression_model
     steps:
       - checkout:
           path: ~/project
       - run:
-          name: Install compatible versions of tools
+          name: Run tests with Python 3.8
           command: |
-            pip install --upgrade pip
-            pip install virtualenv==20.24.4  # Pin virtualenv
-            pip install tox==3.28.0         # Pin tox
-      - run:
-          name: Run regression model tests with Python 3.8
-          command: |
-            pip install chardet==3.0.2
+            sudo pip install --upgrade pip
             pip install --user tox
             tox -e py38
               
@@ -149,22 +143,15 @@ jobs:
 
   test_ml_api_py38:
     docker:
-      - image: circleci/python:3.8
+      - image: circleci/python:3.8.1
     working_directory: ~/project/packages/ml_api
     steps:
       - checkout:
           path: ~/project
       - run:
-          name: Install compatible versions of tools
-          command: |
-            sudo pip install --upgrade pip
-            sudo pip install virtualenv==20.24.4  # Pin virtualenv
-            sudo pip install tox==3.28.0         # Pin tox
-      - run:
           name: Run API tests with Python 3.8
           command: |
-            pip install --upgrade pip
-            pip install chardet==3.0.2
+            sudo pip install --upgrade pip
             pip install --user tox
             tox -e py38
 
@@ -197,25 +184,13 @@ jobs:
       - checkout
       - *prepare_venv
       - run:
-          name: Install system-level dependencies
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y python3-distutils build-essential
-            sudo apt-get install -y python3.8-dev  # Use Python 3.8 development headers
-      - run:
-          name: Upgrade pip, setuptools, and wheel
-          command: |
-            . venv/bin/activate
-            pip install --upgrade pip setuptools wheel
-            pip install cython
-      - run:
           name: Capturing previous model predictions
           command: |
             . venv/bin/activate
             pip install -r packages/ml_api/diff_test_requirements.txt
             PYTHONPATH=./packages/ml_api python3 packages/ml_api/tests/capture_model_predictions.py
       - run:
-          name: Running differential tests
+          name: Runnning differential tests
           command: |
             . venv/bin/activate
             pip install -r packages/ml_api/requirements.txt
