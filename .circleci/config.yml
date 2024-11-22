@@ -94,25 +94,25 @@ jobs:
           command: |
             cd section-08-deploying-with-containers && railway up --service="$RAILWAY_SERVICE_NAME" --detach
 
-#  test_regression_model_py37:
-#    docker:
-#      - image: circleci/python:3.7.6
-#    working_directory: ~/project/packages/regression_model
-#    steps:
-#      - checkout:
-#          path: ~/project
-#      - run:
-#          name: Run tests with Python 3.7
-#          command: |
-#            sudo pip install --upgrade pip
-#            sudo pip install virtualenv==20.20.0
-#            pip install chardet==3.0.2
-#            pip install --user tox
-#            tox -e py37
+  test_regression_model_py37:
+    docker:
+      - image: circleci/python:3.7.6
+    working_directory: ~/project/packages/regression_model
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Run tests with Python 3.7
+          command: |
+            sudo pip install --upgrade pip
+            sudo pip install virtualenv==20.20.0
+            pip install chardet==3.0.2
+            pip install --user tox
+            tox -e py37
 
   test_regression_model_py38:
     docker:
-      - image: circleci/python:3.8.0
+      - image: circleci/python:3.8.1
     working_directory: ~/project/packages/regression_model
     steps:
       - checkout:
@@ -121,25 +121,26 @@ jobs:
           name: Run tests with Python 3.8
           command: |
             sudo pip install --upgrade pip
+            sudo pip install virtualenv==20.20.0
+            pip install chardet==3.0.2
             pip install --user tox
             tox -e py38
-              
 
-#  test_ml_api_py37:
-#    docker:
-#      - image: circleci/python:3.7.6
-#    working_directory: ~/project/packages/ml_api
-#    steps:
-#      - checkout:
-#          path: ~/project
-#      - run:
-#          name: Run API tests with Python 3.7
-#          command: |
-#            sudo pip install --upgrade pip
-#            sudo pip install virtualenv==20.20.0
-#            pip install chardet==3.0.2
-#            pip install --user tox
-#            tox -e py37
+  test_ml_api_py37:
+    docker:
+      - image: circleci/python:3.7.6
+    working_directory: ~/project/packages/ml_api
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Run API tests with Python 3.7
+          command: |
+            sudo pip install --upgrade pip
+            sudo pip install virtualenv==20.20.0
+            pip install chardet==3.0.2
+            pip install --user tox
+            tox -e py37
 
   test_ml_api_py38:
     docker:
@@ -149,27 +150,19 @@ jobs:
       - checkout:
           path: ~/project
       - run:
-          name: Upgrade pip and install virtualenv
-          command: |
-            sudo pip install --upgrade pip
-            pip install --upgrade virtualenv
-      - run:
-          name: Set up virtual environment and install tox
-          command: |
-            python -m venv venv
-            . venv/bin/activate
-            pip install tox
-      - run:
           name: Run API tests with Python 3.8
           command: |
-            . venv/bin/activate
+            sudo pip install --upgrade pip
+            sudo pip install virtualenv==20.20.0
+            pip install chardet==3.0.2
+            pip install --user tox
             tox -e py38
 
   train_and_upload_regression_model:
-    docker:
-      - image: 'circleci/python:3.8'
+    <<: *defaults
     steps:
       - checkout
+      - *prepare_venv
       - run: 
           name: Install requirements
           command: |
@@ -189,10 +182,11 @@ jobs:
             ./scripts/publish_model.sh ./packages/regression_model/
 
   section_9_differential_tests:
-    <<: *defaults
+    docker:
+      - image: circleci/python:3.8.1
+    working_directory: ~/project
     steps:
       - checkout
-      - *prepare_venv
       - run:
           name: Capturing previous model predictions
           command: |
@@ -303,16 +297,16 @@ workflows:
   test-all:
     jobs:
 #      - test_regression_model_py36
-#      - test_regression_model_py37
+      - test_regression_model_py37
       - test_regression_model_py38
-#      - test_ml_api_py37
+      - test_ml_api_py37
       - test_ml_api_py38
       - section_9_differential_tests
       - train_and_upload_regression_model:
           requires:
-#            - test_regression_model_py37
+            - test_regression_model_py37
             - test_regression_model_py38
-#            - test_ml_api_py37
+            - test_ml_api_py37
             - test_ml_api_py38
             - section_9_differential_tests
           filters:
