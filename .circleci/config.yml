@@ -189,11 +189,10 @@ jobs:
             ./scripts/publish_model.sh ./packages/regression_model/
 
   section_9_differential_tests:
-    docker:
-      - image: circleci/python:3.8.1
-    working_directory: ~/project
+    <<: *defaults
     steps:
       - checkout
+      - *prepare_venv
       - run:
           name: Capturing previous model predictions
           command: |
