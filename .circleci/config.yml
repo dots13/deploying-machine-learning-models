@@ -149,11 +149,18 @@ jobs:
       - checkout:
           path: ~/project
       - run:
-          name: Run API tests with Python 3.8
+          name: Install Dependencies
           command: |
             sudo pip install --upgrade pip
-            pip install --user tox
-            tox -e py38
+            pip install chardet==3.0.2
+            pip install virtualenv==20.21.1
+            pip install --user tox==3.28.0
+      - run:
+          name: Set Virtualenv Plugin Environment Variable
+          command: export VIRTUALENV_NO_PLUGIN=1
+      - run:
+          name: Run API Tests with Python 3.8
+          command: tox -e py38 -- --clear
 
   train_and_upload_regression_model:
     <<: *defaults
