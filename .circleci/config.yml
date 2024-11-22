@@ -137,6 +137,8 @@ jobs:
           name: Run API tests with Python 3.7
           command: |
             sudo pip install --upgrade pip
+            sudo pip install virtualenv==20.20.0
+            pip install chardet==3.0.2
             pip install --user tox
             tox -e py37
 
@@ -151,6 +153,8 @@ jobs:
           name: Run API tests with Python 3.8
           command: |
             sudo pip install --upgrade pip
+            sudo pip install virtualenv==20.20.0
+            pip install chardet==3.0.2
             pip install --user tox
             tox -e py38
 
