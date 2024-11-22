@@ -190,7 +190,7 @@ jobs:
 
   section_9_differential_tests:
     docker:
-      - image: circleci/python:3.8.
+      - image: circleci/python:3.8
     working_directory: ~/project
     steps:
       - checkout
