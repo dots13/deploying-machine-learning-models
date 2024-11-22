@@ -166,22 +166,45 @@ jobs:
             tox -e py38  # Run tox using the Python 3.8 environment
 
   train_and_upload_regression_model:
-    <<: *defaults
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/project
     steps:
-      - checkout
-      - *prepare_venv
-      - run: 
+      - checkout:
+          path: ~/project
+      - restore_cache:
+          keys:
+            - venv-{{ checksum "packages/regression_model/requirements.txt" }}  # Cache key based on requirements
+            - venv-  # Fallback cache key
+      - run:
+          name: Create virtual environment if not exists
+          command: |
+            if [ ! -d "venv" ]; then
+              python -m venv venv
+            fi
+            . venv/bin/activate
+            pip install --upgrade pip  # Upgrade pip inside the virtual environment
+      - run:
           name: Install requirements
           command: |
             . venv/bin/activate
             pip install -r packages/regression_model/requirements.txt
-      - *fetch_data
-      - run: 
+      - run:
+          name: Set script permissions and fetch data
+          command: |
+            . venv/bin/activate
+            chmod +x ./scripts/fetch_kaggle_dataset.sh
+            ./scripts/fetch_kaggle_dataset.sh
+      - run:
+          name: Verify dataset is downloaded
+          command: |
+            ls -lh packages/regression_model/regression_model/datasets/
+      - run:
           name: Train model
           command: |
             . venv/bin/activate
             PYTHONPATH=./packages/regression_model python3 packages/regression_model/regression_model/train_pipeline.py
-      - run: 
+      - run:
           name: Publish model to Gemfury
           command: |
             . venv/bin/activate
@@ -297,25 +320,25 @@ tags_only: &tags_only
 
 workflows:
   version: 2
-  deploy_pipeline:
-    jobs:
-      - section_07_test_app
-      - section_07_deploy_app_to_railway:
-          requires:
-            - section_07_test_app
-          filters:
-            branches:
-              only:
-                - master
-                - demo
-      - section_07_test_and_upload_regression_model:
-          <<: *tags_only
-      - section_08_deploy_app_container_via_railway:
-          filters:
-            branches:
-              only:
-                - master
-                - demo
+#  deploy_pipeline:
+#    jobs:
+#      - section_07_test_app
+#      - section_07_deploy_app_to_railway:
+#          requires:
+#            - section_07_test_app
+#          filters:
+#            branches:
+#              only:
+#                - master
+#                - demo
+#      - section_07_test_and_upload_regression_model:
+#          <<: *tags_only
+#      - section_08_deploy_app_container_via_railway:
+#          filters:
+#            branches:
+#              only:
+#                - master
+#                - demo
 
   test-all:
     jobs:
@@ -330,11 +353,14 @@ workflows:
             - test_regression_model_py38
 #            - test_ml_api_py37
             - test_ml_api_py38
+      - train_and_upload_regression_model:
+          requires:
+            - section_9_differential_tests
           filters:
             branches:
               only:
                 - master
-                - dll
+                - upload_rm
 #      - section_10_deploy_to_heroku:
 #          requires:
 #            - section_13_train_and_upload_neural_network_model
