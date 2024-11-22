@@ -197,13 +197,24 @@ jobs:
       - checkout
       - *prepare_venv
       - run:
+          name: Install system-level dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y python3-distutils build-essential
+      - run:
+          name: Upgrade pip, setuptools, and wheel
+          command: |
+            . venv/bin/activate
+            pip install --upgrade pip setuptools wheel
+            pip install cython
+      - run:
           name: Capturing previous model predictions
           command: |
             . venv/bin/activate
             pip install -r packages/ml_api/diff_test_requirements.txt
             PYTHONPATH=./packages/ml_api python3 packages/ml_api/tests/capture_model_predictions.py
       - run:
-          name: Runnning differential tests
+          name: Running differential tests
           command: |
             . venv/bin/activate
             pip install -r packages/ml_api/requirements.txt
