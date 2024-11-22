@@ -166,10 +166,10 @@ jobs:
             tox -e py38
 
   train_and_upload_regression_model:
-    <<: *defaults
+    docker:
+      - image: 'circleci/python:3.8'
     steps:
       - checkout
-      - *prepare_venv
       - run: 
           name: Install requirements
           command: |
